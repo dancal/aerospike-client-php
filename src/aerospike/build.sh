@@ -77,20 +77,12 @@ parse_args () {
     done
 }
 
-<<<<<<< HEAD
-if [ ! -z "$(which php-config)" ]; then
-    PHP_CONFIG=`which php-config`
-else
-    PHP_CONFIG="php-config"
-fi
-=======
 #if [ ! -z "$(which php-config)" ]; then
 #    PHP_CONFIG=`which php-config`
 #else
 #    PHP_CONFIG="php-config"
 #fi
 
->>>>>>> b7d410704154747d511561cced2b3f04da742d56
 PHP_CONFIG="/usr/bin/php-config"
 
 if [ -f Makefile ]; then
