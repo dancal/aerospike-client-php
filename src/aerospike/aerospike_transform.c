@@ -13,6 +13,9 @@
 #include "aerospike_transform.h"
 #include "aerospike_policy.h"
 
+#include "aerospike/as_record.h"
+#include "aerospike/as_record_iterator.h"
+#include <ext/standard/base64.h>
 /*
  *******************************************************************************************************
  * MACRO TO COMPARE TWO KEYS OF A PHP ARRAY
@@ -908,15 +911,24 @@ static void ADD_DEFAULT_ASSOC_STRING(void *key, void *value, void *array, void *
     if (key == NULL) {
         zval* string_zval_p = NULL;
         ALLOC_INIT_ZVAL(string_zval_p);
-        ZVAL_STRINGL(string_zval_p, as_string_get((as_string *) value),
-                 strlen(as_string_get((as_string *) value)), 1);
+<<<<<<< HEAD
+        ZVAL_STRINGL(string_zval_p, as_string_get((as_string *) value), strlen(as_string_get((as_string *) value)), 1);
         zval_dtor((zval *)array);
         ZVAL_ZVAL((zval *)array, string_zval_p, 1, 1);
     } else {
-        add_assoc_stringl(((zval *) array), (char *) key,
-                as_string_get((as_string *) value),
-                strlen(as_string_get((as_string *) value)), 1);
+        add_assoc_stringl(((zval *) array), (char *) key, as_string_get((as_string *) value), as_string_len((as_string *) value), 1);
+=======
+        //ZVAL_STRINGL(string_zval_p, as_string_get((as_string *) value), as_string_len(as_string_get((as_string *) value)), 1);
+		ZVAL_STRINGL(string_zval_p, as_string_get((as_string *) value), as_string_len((as_string *) value), 1);
+
+        zval_dtor((zval *)array);
+        ZVAL_ZVAL((zval *)array, string_zval_p, 1, 1);
+    } else {
+        //add_assoc_stringl(((zval *) array), (char *) key, as_string_get((as_string *) value), as_string_len(as_string_get((as_string *) value)), 1);
+		add_assoc_stringl(((zval *) array), (char *) key, as_string_get((as_string *) value), as_string_len((as_string *) value), 1);
+>>>>>>> b7d410704154747d511561cced2b3f04da742d56
     }
+
     PHP_EXT_SET_AS_ERR((as_error *) err, AEROSPIKE_OK, DEFAULT_ERROR);
 }
 
