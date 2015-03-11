@@ -19,26 +19,7 @@ export CLIENTREPO_FLATFORM=`/bin/uname -s`
 export CLIENTREPO_SYSTEM=`/bin/uname -m`
 export CLIENTREPO_3X=${PWD}/../../../aerospike-client-c
 export CLIENTREPO_INC=${PWD}/../../../aerospike-client-c/target/${CLIENTREPO_FLATFORM}-${CLIENTREPO_SYSTEM}/include
-<<<<<<< HEAD
-export AEROSPIKE_C_CLIENT=${AEROSPIKE_C_CLIENT:-3.1.8}
-if [[ ! -d $CLIENTREPO_3X || ! `ls $CLIENTREPO_3X/package/aerospike-client-c-devel-${AEROSPIKE_C_CLIENT}* 2> /dev/null` ]]; then
-    rm -rf $CLIENTREPO_3X/package
-=======
 export AEROSPIKE_C_CLIENT=${AEROSPIKE_C_CLIENT:-3.0.94}
-if [ ! -d $CLIENTREPO_3X ]; then
->>>>>>> b7d410704154747d511561cced2b3f04da742d56
-    echo "Downloading Aerospike C Client SDK $AEROSPIKE_C_CLIENT"
-else
-    echo "Aerospike C Client SDK is present."
-fi
-<<<<<<< HEAD
-#$CLIENTREPO_3X/scripts/aerospike-client-c.sh
-=======
-#scripts/aerospike-client-c.sh
->>>>>>> b7d410704154747d511561cced2b3f04da742d56
-#if [ $? -gt 0 ]; then
-#    exit 1
-#fi
 
 LOGLEVEL="PHP_EXT_AS_LOG_LEVEL_OFF"
 
