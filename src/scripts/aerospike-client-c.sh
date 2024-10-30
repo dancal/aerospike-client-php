@@ -1,6 +1,6 @@
 #!/bin/bash
 ################################################################################
-# Aerospike Client C 설치 스크립트 (압축 해제 후 .deb 파일 자동 설치)
+# Aerospike Client C 설치 스크립트 (OS 기본 라이브러리 경로 자동 탐지)
 ################################################################################
 
 CWD=$(pwd)
@@ -8,11 +8,10 @@ SCRIPT_DIR=$(dirname $0)
 BASE_DIR=$(cd "${SCRIPT_DIR}/.."; pwd)
 AEROSPIKE=${CWD}/../aerospike-client-c
 DOWNLOAD_DIR=${AEROSPIKE}/package
-AEROSPIKE_C_VERSION=${AEROSPIKE_C_VERSION:-'6.4.4'}
+AEROSPIKE_C_VERSION=${AEROSPIKE_C_VERSION:-'6.6.4'}
 
 DOWNLOAD=${DOWNLOAD_C_CLIENT:-1}
 COPY_FILES=1
-LIB_PATH=${PREFIX}
 
 ################################################################################
 # FUNCTIONS
@@ -20,6 +19,20 @@ LIB_PATH=${PREFIX}
 
 has_cmd() {
   hash "$1" 2> /dev/null
+}
+
+find_default_lib_path() {
+  # 기본 경로 우선순위에 따라 탐색
+  if has_cmd pkg-config && pkg-config --exists aerospike; then
+    # `pkg-config` 사용해 라이브러리 경로 찾기
+    pkg-config --variable=libdir aerospike
+  elif has_cmd ldconfig; then
+    # `ldconfig`을 사용해 기본 경로에서 라이브러리 검색
+    ldconfig -p | grep -m1 'libaerospike' | awk '{print $NF}' | xargs dirname
+  else
+    # 기본 경로로 설정
+    echo "/usr/local/lib"
+  fi
 }
 
 download_and_extract_tgz() {
@@ -68,12 +81,12 @@ if [ $DOWNLOAD -eq 1 ]; then
 fi
 
 ################################################################################
-# LIBRARY PATH 및 필요한 파일 확인
+# LIBRARY PATH 설정 및 필요한 파일 확인
 ################################################################################
 
-LIB_PATH=/usr
-AEROSPIKE_LIBRARY=${LIB_PATH}/lib/libaerospike.a
-AEROSPIKE_INCLUDE=${LIB_PATH}/include
+LIB_PATH=$(find_default_lib_path)
+AEROSPIKE_LIBRARY=${LIB_PATH}/libaerospike.a
+AEROSPIKE_INCLUDE=${LIB_PATH}/../include  # include 경로는 라이브러리 경로와 다를 수 있으므로 조정 필요
 
 printf "\nCHECK\n"
 if [ -f ${AEROSPIKE_LIBRARY} ]; then
