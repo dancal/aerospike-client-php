@@ -71,7 +71,7 @@ fi
 # LIBRARY PATH 및 필요한 파일 확인
 ################################################################################
 
-LIB_PATH=${AEROSPIKE}/package/usr
+LIB_PATH=/usr
 AEROSPIKE_LIBRARY=${LIB_PATH}/lib/libaerospike.a
 AEROSPIKE_INCLUDE=${LIB_PATH}/include
 
