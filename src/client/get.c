@@ -139,7 +139,8 @@ static as_status as_get_with_bins(aerospike* as, as_error* err, const as_key* ke
 	/** Array of strings must be null terminated,
 	 ** so leave space for a null final entry.
 	**/
-	c_filter_bins = (char**)alloca((num_bins + 1) * sizeof(char*));
+	// c_filter_bins = (char**)alloca((num_bins + 1) * sizeof(char*));
+	c_filter_bins = (char**)emalloc((num_bins + 1) * sizeof(char*));
 	c_filter_bins[num_bins] = NULL;
 
 	int i = 0;
@@ -150,22 +151,32 @@ static as_status as_get_with_bins(aerospike* as, as_error* err, const as_key* ke
 		/* If the value isn't a string bail out, need string values only */
 		if (Z_TYPE_P(bin_val) != IS_STRING) {
 			as_error_update(err, AEROSPIKE_ERR_PARAM, "Bin names must be strings");
+			efree(c_filter_bins);
 			return err->code;
 		}
 
 		if (Z_STRLEN_P(bin_val) > AS_BIN_NAME_MAX_LEN) {
 			as_error_update(err, AEROSPIKE_ERR_PARAM, "Bin name too long");
+			efree(c_filter_bins);
 			return err->code;
 		}
 
+		
 		/* Allocate and load the bin name */
-		c_filter_bins[i] = (char*)alloca(AS_BIN_NAME_MAX_SIZE * sizeof(char));
-		strncpy(c_filter_bins[i], Z_STRVAL_P(bin_val), AS_BIN_NAME_MAX_LEN);
-		c_filter_bins[i][AS_BIN_NAME_MAX_LEN] = '\0';
+		// c_filter_bins[i] = (char*)alloca(AS_BIN_NAME_MAX_SIZE * sizeof(char));
+		// strncpy(c_filter_bins[i], Z_STRVAL_P(bin_val), AS_BIN_NAME_MAX_LEN);
+		// c_filter_bins[i][AS_BIN_NAME_MAX_LEN] = '\0';
+		c_filter_bins[i] = estrdup(Z_STRVAL_P(bin_val));
 
 		i++;
 	} ZEND_HASH_FOREACH_END();
 
 	aerospike_key_select(as, err, read_policy_p, key, (const char**)c_filter_bins, record);
+
+    	for (int j = 0; j < num_bins; j++) {
+        	efree(c_filter_bins[j]);
+    	}
+    	efree(c_filter_bins);
+
 	return err->code;
 }

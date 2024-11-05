@@ -30,7 +30,9 @@ as_status serialize_with_user_function(const zval* zval_to_serialize, as_bytes**
 			memcpy(&local_serializer_cache, &AEROSPIKE_G(user_global_serializer_call_info_cache), sizeof(zend_fcall_info_cache));
 
 			//params is array of zval so we need to dereference this
-			z_params[0] = *zval_to_serialize;
+			//z_params[0] = *zval_to_serialize;
+			ZVAL_COPY_VALUE(&z_params[0], zval_to_serialize);
+
 			local_serializer.retval = &z_bytes_str;
 			local_serializer.params= z_params;
 			local_serializer.param_count = 1;
@@ -48,6 +50,11 @@ as_status serialize_with_user_function(const zval* zval_to_serialize, as_bytes**
 
 			bytes_len = Z_STRLEN(z_bytes_str);
 			*serialized_bytes = as_bytes_new(bytes_len);
+			if (*serialized_bytes == NULL) {
+    			as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to allocate memory for serialized bytes");
+    			zval_dtor(&z_bytes_str);
+    			return AEROSPIKE_ERR_CLIENT;
+			}
 
 			as_bytes_set(*serialized_bytes, 0, (const uint8_t*)Z_STRVAL(z_bytes_str), bytes_len);
 			as_bytes_set_type(*serialized_bytes, AS_BYTES_BLOB);

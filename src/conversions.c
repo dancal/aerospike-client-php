@@ -195,48 +195,45 @@ CLEANUP:
 
 
 as_status as_bins_to_zval(const as_record* aerospike_record, zval* z_bins, as_error* err) {
+    as_bin* bin = NULL;
+    as_bin_value* bin_val = NULL;
 
-	as_bin* bin = NULL;
-	as_bin_value* bin_val = NULL;
+    array_init(z_bins); // 초기화
 
-	zval z_bin_value;
-	ZVAL_NULL(&z_bin_value);
+    as_record_iterator it;
+    as_record_iterator_init(&it, aerospike_record);
 
-	array_init(z_bins);
+    while (as_record_iterator_has_next(&it)) {
+        bin = as_record_iterator_next(&it);
+        if (!bin) {
+            as_error_update(err, AEROSPIKE_ERR_CLIENT, "Null bin");
+            goto CLEANUP;
+        }
 
-	as_record_iterator it;
-	as_record_iterator_init(&it, aerospike_record);
+        bin_val = as_bin_get_value(bin);
+        if (!bin_val) {
+            as_error_update(err, AEROSPIKE_ERR_CLIENT, "Null bin value");
+            goto CLEANUP;
+        }
 
-	while (as_record_iterator_has_next(&it)) {
-		bin = as_record_iterator_next(&it);
-		if (!bin) {
-			as_error_update(err, AEROSPIKE_ERR_CLIENT, "Null bin");
-			goto CLEANUP;
-		}
-		bin_val = as_bin_get_value(bin);
-		if (!bin_val) {
-			as_error_update(err, AEROSPIKE_ERR_CLIENT, "Null bin value");
-			goto CLEANUP;
-		}
-		if (as_val_to_zval((as_val*)bin_val, &z_bin_value, err) != AEROSPIKE_OK) {
-			/* In case of error this will have set the err code, so don't reset it here */
-			goto CLEANUP;
-		}
-		//if (add_assoc_zval(z_bins, bin->name, &z_bin_value) != SUCCESS) {
-		//	zval_dtor(&z_bin_value);
-		//	as_error_update(err, AEROSPIKE_ERR_CLIENT, "Failed to add zval to hashtable");
-		//	goto CLEANUP;
-		// }
-		add_assoc_zval(z_bins, bin->name, &z_bin_value);
-	}
+        zval z_bin_value; // z_bin_value 초기화
+        ZVAL_NULL(&z_bin_value);
+
+        if (as_val_to_zval((as_val*)bin_val, &z_bin_value, err) != AEROSPIKE_OK) {
+            goto CLEANUP;
+        }
+
+        add_assoc_zval(z_bins, bin->name, &z_bin_value);
+    }
 
 CLEANUP:
-	as_record_iterator_destroy(&it);
-	if (err->code != AEROSPIKE_OK) {
-		zval_dtor(z_bins);
-		ZVAL_NULL(z_bins);
-	}
-	return err->code;
+    as_record_iterator_destroy(&it);
+
+    if (err->code != AEROSPIKE_OK) {
+        zval_ptr_dtor(z_bins); // z_bins 메모리 해제
+        ZVAL_NULL(z_bins);
+    }
+    return err->code;
 }
 
 /**

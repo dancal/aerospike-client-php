@@ -243,14 +243,13 @@ PHP_METHOD(Aerospike, __construct)
 	as_error_init(&client->client_error);
 	zend_error_handling error_handling; // store the old error handling here
 
-	// zend_update_property_long(aerospike_ce, getThis(), "errorno", sizeof("errorno") - 1, AEROSPIKE_OK);
-	// zend_update_property_string(aerospike_ce, getThis(), "error", sizeof("error") - 1, "");
+	// zend_update_property_long(aerospike_ce, this_obj, "errorno", sizeof("errorno") - 1, AEROSPIKE_OK);
+	// zend_update_property_string(aerospike_ce, this_obj, "error", sizeof("error") - 1, "");
 	// zend_update_property_long(aerospike_ce, Z_OBJ_P(getThis()), "errorno", sizeof("errorno") - 1, AEROSPIKE_OK);
 	// zend_update_property_string(aerospike_ce, Z_OBJ_P(getThis()), "error", sizeof("error") - 1, "");
 
 	zend_replace_error_handling(EH_THROW, NULL, &error_handling ); // fail to construct here must raise error
-	if (zend_parse_parameters(ZEND_NUM_ARGS() , "h|bh",
-		&z_config, &persistent, &z_options) != SUCCESS) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() , "h|bh", &z_config, &persistent, &z_options) != SUCCESS) {
 		zend_restore_error_handling(&error_handling);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	}
@@ -262,7 +261,7 @@ PHP_METHOD(Aerospike, __construct)
 	}
 
 	z_hosts = zend_hash_str_find(z_config, "hosts", strlen("hosts"));
-	if (!z_hosts) {
+	if (!z_hosts || Z_TYPE_P(z_hosts) != IS_ARRAY) {
 		zend_throw_exception(NULL, "An entry for hosts must be included in the config array", 0);
 		RETURN_LONG(AEROSPIKE_ERR_PARAM);
 	} 

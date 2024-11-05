@@ -42,7 +42,7 @@ if (isset($args["help"])) {
     exit(1);
 }
 $HOST_ADDR = (isset($args["h"])) ? (string) $args["h"] : ((isset($args["host"])) ? (string) $args["host"] : "localhost");
-$HOST_PORT = (isset($args["p"])) ? (integer) $args["p"] : ((isset($args["port"])) ? (string) $args["port"] : 3000);
+$HOST_PORT = (isset($args["p"])) ? (integer) $args["p"] : ((isset($args["port"])) ? (int) $args["port"] : 3000);
 
 echo colorize("Connecting to the host ≻", 'black', true);
 $start = __LINE__;
@@ -57,8 +57,8 @@ if (isset($args['a']) || isset($args['annotate'])) display_code(__FILE__, $start
 
 echo colorize("Writing a record in test.characters with PK=1234 ≻", 'black', true);
 $start = __LINE__;
-$digest = $db->getKeyDigest("test", "characters", 1234);
-$key = $db->initKey("test", "characters", $digest, true);
+$digest = $db->getKeyDigest("memory", "characters", 1234);
+$key = $db->initKey("memory", "characters", $digest, true);
 $put_vals = array("email" => "freudian.circuits@hal-inst.org", "name" => "Perceptron");
 $status = $db->put($key, $put_vals);
 if ($status == Aerospike::OK) {

@@ -152,15 +152,15 @@ PHP_RINIT_FUNCTION(aerospike)
  */
 PHP_RSHUTDOWN_FUNCTION(aerospike)
 {
-	if AEROSPIKE_G(is_global_user_serializer_registered) {
+	if (AEROSPIKE_G(is_global_user_serializer_registered)) {
 		zval_dtor(&AEROSPIKE_G(user_global_serializer_call_info).function_name);
 	}
 
-	if AEROSPIKE_G(is_global_user_deserializer_registered) {
+	if (AEROSPIKE_G(is_global_user_deserializer_registered)) {
 		zval_dtor(&AEROSPIKE_G(user_global_deserializer_call_info).function_name);
 	}
 
-	if AEROSPIKE_G(is_log_callback_registered) {
+	if (AEROSPIKE_G(is_log_callback_registered)) {
 		zval_dtor(&AEROSPIKE_G(log_callback_call_info).function_name);
 	}
 
