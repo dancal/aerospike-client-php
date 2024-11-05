@@ -21,7 +21,6 @@
 #define GEOJSON_CLASS_TO_STR "__toString"
 #define GEOJSON_STATIC_CONSTRUCTOR "fromJson"
 
-
 /**
  * Data used to facilitate conversion of an as_list to a php array
  * Utilized as an argument to as_list_foreach
