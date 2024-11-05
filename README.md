@@ -1,6 +1,6 @@
 # Aerospike PHP Client
-[![Build Status](https://travis-ci.org/aerospike/aerospike-client-php.svg?branch=master)](https://travis-ci.org/aerospike/aerospike-client-php)
-[![License](https://img.shields.io/packagist/l/aerospike/aerospike-client-php.svg)](https://img.shields.io/packagist/l/aerospike/aerospike-client-php.svg)
+[![Build Status](https://travis-ci.org/dancal/aerospike-client-php.svg?branch=master)](https://travis-ci.org/dancal/aerospike-client-php)
+[![License](https://img.shields.io/packagist/l/dancal/aerospike-client-php.svg)](https://img.shields.io/packagist/l/dancal/aerospike-client-php.svg)
 
 Note: This client supports PHP versions >= 8.3 . If you are looking for the Legacy client which supports PHP versions up through 5, it can be found at the [aerospike-client-php5 repo](https://github.com/aerospike/aerospike-client-php5)
 
