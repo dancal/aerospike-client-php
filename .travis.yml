@@ -1,0 +1,39 @@
+# 언어 및 PHP 버전 설정
+language: php
+
+php:
+  - 8.3
+
+# 필요한 서비스 추가
+services:
+  - docker
+
+# Aerospike C Client SDK 설치
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libssl-dev autoconf automake libtool
+  - git clone --recurse-submodules https://github.com/dancal/aerospike-client-c.git
+  - cd aerospike-client-c
+  - make
+  - sudo make install
+  - cd ..
+
+# 프로젝트 빌드 설정
+install:
+  - composer install
+  - cd src
+  - ./build.sh  # Aerospike PHP extension 빌드
+  - cd ..
+  
+# 빌드 결과 확인 및 테스트 실행
+script:
+  - php -m | grep aerospike # 모듈이 로드되었는지 확인
+
+# 알림 설정
+notifications:
+  email:
+    recipients:
+      - dancal@empas.com
+    on_success: always
+    on_failure: always
+
