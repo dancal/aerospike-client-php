@@ -1,0 +1,46 @@
+name: Aerospike PHP Client CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 최신 커밋만 체크아웃하여 속도 향상
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # PHP와 필요한 의존성 설치
+      - name: Set up PHP and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-dev php-pear autoconf build-essential git
+          sudo pecl install aerospike
+
+      # Aerospike 서버 클라이언트 및 소스 빌드 준비
+      - name: Clone and Build Aerospike Client
+        run: |
+          git clone https://github.com/dancal/aerospike-client-php8.git
+          cd aerospike-client-php8
+          phpize
+          ./configure
+          make
+          sudo make install
+
+      # PHP 설정에 Aerospike 확장 모듈 추가
+      - name: Configure Aerospike Extension
+        run: |
+          echo "extension=aerospike.so" | sudo tee -a $(php -i | grep 'Loaded Configuration' | awk '{print $5}')
+          php -m | grep aerospike
+
+      # Aerospike PHP 클라이언트의 테스트 실행
+      - name: Run Tests
+        working-directory: aerospike-client-php8
+        run: |
+          php ./tests/test.php
